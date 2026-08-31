@@ -1,8 +1,10 @@
-import { navLinks, clinic, doctor, disclaimer } from "../utils/data";
+import { navLinks, doctor, disclaimer } from "../utils/data";
+import { useClinicInfo } from "../hooks/useClinicInfo";
 import { Container } from "./ui/Container";
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const clinic = useClinicInfo();
 
   return (
     <footer className="relative border-t border-white/5 bg-navy-950 pb-8 pt-16">

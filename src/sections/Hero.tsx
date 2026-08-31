@@ -2,11 +2,13 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Clock, MapPin, Phone } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
-import { clinic, doctor } from "../utils/data";
+import { doctor } from "../utils/data";
+import { useClinicInfo } from "../hooks/useClinicInfo";
 import scanSession from "../assets/dr-irshad-abdominal-scan.jpg";
 
 export function Hero() {
   const reduced = useReducedMotion();
+  const clinic = useClinicInfo();
 
   return (
     <section id="home" className="relative flex min-h-screen items-center overflow-hidden bg-navy-950 pt-28 pb-16">

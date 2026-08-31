@@ -3,13 +3,14 @@ import { Container } from "../components/ui/Container";
 import { SectionHeading } from "../components/ui/SectionHeading";
 import { Reveal } from "../components/ui/Reveal";
 import { Button } from "../components/ui/Button";
-import { clinic } from "../utils/data";
-
-const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  `${clinic.name}, ${clinic.fullAddress}`,
-)}`;
+import { useClinicInfo } from "../hooks/useClinicInfo";
 
 export function Clinic() {
+  const clinic = useClinicInfo();
+  const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${clinic.name}, ${clinic.fullAddress}`,
+  )}`;
+
   return (
     <section id="clinic" className="relative overflow-hidden bg-navy-900 py-24 sm:py-32">
       <div className="pointer-events-none absolute inset-0 grid-overlay opacity-15" />
