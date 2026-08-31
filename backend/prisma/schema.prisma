@@ -1,0 +1,263 @@
+// Prisma schema for Dr. Hassan Irshad — Ultrasound Clinic backend
+// Datasource: PostgreSQL (see .env DATABASE_URL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Connection URL lives in prisma.config.ts (CLI) and is passed to
+// PrismaClient via a driver adapter at runtime (see src/prisma/prisma.service.ts) —
+// Prisma 7 no longer reads `url` from this block.
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Admin / Auth
+// ---------------------------------------------------------------------------
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  STAFF
+}
+
+model AdminUser {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(STAFF)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastLoginAt  DateTime?
+
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+  uploadedFiles FileAsset[]
+
+  @@index([role])
+  @@map("admin_users")
+}
+
+// Refresh tokens are stored hashed; the raw token only ever exists in the
+// httpOnly cookie sent to the client. Rotation: each refresh issues a new
+// token and revokes the previous one.
+model RefreshToken {
+  id          String    @id @default(uuid())
+  tokenHash   String    @unique
+  adminUserId String
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  userAgent   String?
+  ipAddress   String?
+
+  @@index([adminUserId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// Ultrasound services (public catalog)
+// ---------------------------------------------------------------------------
+
+enum ServiceCategory {
+  GENERAL
+  OBSTETRIC
+  GYNECOLOGICAL
+  SMALL_PARTS
+  SCROTAL
+  MUSCULOSKELETAL
+  VASCULAR
+  DOPPLER
+  PEDIATRIC
+  RENAL_URINARY
+}
+
+model Service {
+  id               String          @id @default(uuid())
+  name             String
+  slug             String          @unique
+  category         ServiceCategory
+  shortDescription String
+  description      String
+  isActive         Boolean         @default(true)
+  displayOrder     Int             @default(0)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+  @@map("services")
+}
+
+// ---------------------------------------------------------------------------
+// Appointment requests (public form -> admin-managed)
+// ---------------------------------------------------------------------------
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+model AppointmentRequest {
+  id               String            @id @default(uuid())
+  patientName      String
+  patientPhone     String
+  requestedService String
+  preferredDate    DateTime?         @db.Date
+  preferredTime    String?
+  message          String?
+  status           AppointmentStatus @default(PENDING)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([status])
+  @@index([preferredDate])
+  @@index([patientPhone])
+  @@index([createdAt])
+  @@map("appointment_requests")
+}
+
+// ---------------------------------------------------------------------------
+// Contact inquiries (public form -> admin-managed)
+// ---------------------------------------------------------------------------
+
+enum InquiryStatus {
+  NEW
+  READ
+  RESOLVED
+}
+
+model Inquiry {
+  id        String        @id @default(uuid())
+  name      String
+  phone     String
+  email     String?
+  message   String
+  status    InquiryStatus @default(NEW)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("inquiries")
+}
+
+// ---------------------------------------------------------------------------
+// Clinic settings (singleton row, id fixed to 1)
+// ---------------------------------------------------------------------------
+
+model ClinicSettings {
+  id           Int      @id @default(1)
+  name         String
+  addressLine1 String
+  addressLine2 String
+  hours        String
+  phoneDisplay String?
+  phoneHref    String?
+  updatedAt    DateTime @updatedAt
+
+  @@map("clinic_settings")
+}
+
+// ---------------------------------------------------------------------------
+// Audit log
+// ---------------------------------------------------------------------------
+
+model AuditLog {
+  id          String    @id @default(uuid())
+  userId      String?
+  adminUser   AdminUser? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String
+  resource    String
+  resourceId  String?
+  metadata    Json?
+  ipAddress   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([resource, resourceId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ---------------------------------------------------------------------------
+// Patients (future-ready, strictly protected, minimal fields)
+// ---------------------------------------------------------------------------
+
+enum PatientGender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Patient {
+  id          String         @id @default(uuid())
+  name        String
+  phone       String
+  dateOfBirth DateTime?      @db.Date
+  gender      PatientGender?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  reports UltrasoundReport[]
+
+  @@index([phone])
+  @@map("patients")
+}
+
+// ---------------------------------------------------------------------------
+// Ultrasound reports (future-ready, strictly protected — no public access)
+// ---------------------------------------------------------------------------
+
+enum ReportStatus {
+  DRAFT
+  FINAL
+  AMENDED
+}
+
+model UltrasoundReport {
+  id         String       @id @default(uuid())
+  patientId  String
+  patient    Patient      @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  reportType String
+  reportDate DateTime     @db.Date
+  status     ReportStatus @default(DRAFT)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  files FileAsset[]
+
+  @@index([patientId])
+  @@index([status])
+  @@map("ultrasound_reports")
+}
+
+// ---------------------------------------------------------------------------
+// File assets (secure storage abstraction — never publicly exposed)
+// ---------------------------------------------------------------------------
+
+model FileAsset {
+  id                 String            @id @default(uuid())
+  filename           String
+  mimeType           String
+  size               Int
+  storageProvider    String
+  storageKey         String            @unique
+  uploadedByAdminId  String?
+  uploadedByAdmin    AdminUser?        @relation(fields: [uploadedByAdminId], references: [id], onDelete: SetNull)
+  ultrasoundReportId String?
+  ultrasoundReport   UltrasoundReport? @relation(fields: [ultrasoundReportId], references: [id], onDelete: SetNull)
+  createdAt          DateTime          @default(now())
+
+  @@index([ultrasoundReportId])
+  @@map("file_assets")
+}

@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*.local
+.env.local
+
+# Local file storage (uploaded documents — never commit)
+storage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing / coverage
+coverage/
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# OS
+.DS_Store
+
+# Prisma
+prisma/generated/
