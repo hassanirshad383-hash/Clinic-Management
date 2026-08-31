@@ -1,4 +1,4 @@
-import { Clock, MapPin, Navigation2 } from "lucide-react";
+import { Clock, MapPin, Navigation2, Phone } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { SectionHeading } from "../components/ui/SectionHeading";
 import { Reveal } from "../components/ui/Reveal";
@@ -87,12 +87,22 @@ export function Clinic() {
                   <Clock className="mt-0.5 h-5 w-5 shrink-0 text-cyan-glow" />
                   <p className="text-sm leading-relaxed text-mist/80">{clinic.hours}</p>
                 </div>
+                <a href={clinic.phoneHref} className="flex items-start gap-3 transition-colors hover:text-white">
+                  <Phone className="mt-0.5 h-5 w-5 shrink-0 text-cyan-glow" />
+                  <p className="text-sm font-semibold leading-relaxed text-mist/80">{clinic.phoneDisplay}</p>
+                </a>
               </div>
 
-              <Button href={directionsUrl} target="_blank" rel="noopener noreferrer" variant="primary" icon={false} className="w-fit">
-                <Navigation2 className="h-4 w-4" strokeWidth={2.5} />
-                Get Directions
-              </Button>
+              <div className="flex flex-wrap gap-4">
+                <Button href={clinic.phoneHref} variant="primary" icon={false} className="w-fit">
+                  <Phone className="h-4 w-4" strokeWidth={2.5} />
+                  Call Now
+                </Button>
+                <Button href={directionsUrl} target="_blank" rel="noopener noreferrer" variant="secondary" icon={false} className="w-fit">
+                  <Navigation2 className="h-4 w-4" strokeWidth={2.5} />
+                  Get Directions
+                </Button>
+              </div>
             </div>
           </Reveal>
         </div>

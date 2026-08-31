@@ -34,8 +34,11 @@ export function Footer() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-mist/40">Hours</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-mist/40">Contact</p>
             <p className="mt-4 text-sm text-mist/65">{clinic.hours}</p>
+            <a href={clinic.phoneHref} className="mt-1 block text-sm text-cyan-glow transition-colors hover:text-white">
+              {clinic.phoneDisplay}
+            </a>
           </div>
         </div>
 

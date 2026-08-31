@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { Clock, MapPin } from "lucide-react";
+import { Clock, MapPin, Phone } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
 import { clinic, doctor } from "../utils/data";
@@ -61,6 +61,14 @@ export function Hero() {
               <MapPin className="h-4 w-4 text-cyan-glow" />
               {clinic.fullAddress}
             </div>
+            <div className="hidden h-8 w-px bg-white/10 sm:block" />
+            <a
+              href={clinic.phoneHref}
+              className="flex items-center gap-2 text-sm font-semibold text-cyan-glow transition-colors hover:text-white"
+            >
+              <Phone className="h-4 w-4" />
+              {clinic.phoneDisplay}
+            </a>
           </div>
         </motion.div>
 

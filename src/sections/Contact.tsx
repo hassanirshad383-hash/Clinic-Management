@@ -1,4 +1,4 @@
-import { Clock, MapPin, Navigation2 } from "lucide-react";
+import { Clock, MapPin, Navigation2, Phone } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { Reveal } from "../components/ui/Reveal";
 import { Button } from "../components/ui/Button";
@@ -37,11 +37,19 @@ export function Contact() {
               <Clock className="h-4 w-4 text-cyan-glow" />
               Available: {clinic.hours}
             </div>
+            <a
+              href={clinic.phoneHref}
+              className="flex items-center justify-center gap-2 font-semibold text-cyan-glow transition-colors hover:text-white"
+            >
+              <Phone className="h-4 w-4" />
+              {clinic.phoneDisplay}
+            </a>
           </div>
 
           <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-            <Button href="#clinic" variant="primary">
-              Contact Clinic
+            <Button href={clinic.phoneHref} variant="primary" icon={false}>
+              <Phone className="h-4 w-4" strokeWidth={2.5} />
+              Call {clinic.phoneDisplay}
             </Button>
             <Button href={directionsUrl} target="_blank" rel="noopener noreferrer" variant="secondary" icon={false}>
               <Navigation2 className="h-4 w-4" strokeWidth={2.5} />

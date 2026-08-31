@@ -18,6 +18,8 @@ export const clinic = {
   addressLine1: "Stadium Road",
   addressLine2: "Opposite Civil Hospital, Daska",
   fullAddress: "Stadium Road, Opposite Civil Hospital, Daska",
+  phoneDisplay: "0332 5445555",
+  phoneHref: "tel:+923325445555",
 };
 
 export const doctor = {
