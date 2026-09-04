@@ -4,10 +4,12 @@ import { SectionHeading } from "../components/ui/SectionHeading";
 import { Reveal } from "../components/ui/Reveal";
 import { ServiceCard } from "../components/ServiceCard";
 import { ServiceModal } from "../components/ServiceModal";
-import { services, type Service } from "../utils/data";
+import { type Service } from "../utils/data";
+import { useServices } from "../hooks/useServices";
 
 export function Services() {
   const [active, setActive] = useState<Service | null>(null);
+  const services = useServices();
 
   return (
     <section id="services" className="relative overflow-hidden bg-navy-950 py-24 sm:py-32">
