@@ -2,9 +2,17 @@ import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import helmet from 'helmet';
+import helmetImport from 'helmet';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module.js';
+
+// helmet's type declarations don't expose a callable default export under
+// TypeScript's "nodenext" module resolution (a known upstream typing issue —
+// the runtime export is a plain callable function, this only works around
+// the type checker).
+const helmet = helmetImport as unknown as (
+  options?: Record<string, unknown>,
+) => import('express').RequestHandler;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
