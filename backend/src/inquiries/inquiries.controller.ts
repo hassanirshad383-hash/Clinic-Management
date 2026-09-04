@@ -10,7 +10,6 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AdminRole } from '@prisma/client';
 import { Public } from '../common/decorators/public.decorator.js';
@@ -28,7 +27,6 @@ export class InquiriesController {
   constructor(private readonly inquiriesService: InquiriesService) {}
 
   @Public()
-  @Throttle({ public: { limit: 5, ttl: 60_000 } })
   @Post()
   @ApiOperation({ summary: 'Submit a contact inquiry (public)' })
   create(@Body() dto: CreateInquiryDto) {
