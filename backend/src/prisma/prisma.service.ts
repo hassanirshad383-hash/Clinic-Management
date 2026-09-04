@@ -16,10 +16,16 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor(config: ConfigService) {
+    // Falls back to POSTGRES_PRISMA_URL / POSTGRES_URL so this works out of
+    // the box with Vercel's Neon integration, which does not create a plain
+    // DATABASE_URL variable.
+    const connectionString =
+      config.get<string>('DATABASE_URL') ??
+      config.get<string>('POSTGRES_PRISMA_URL') ??
+      config.getOrThrow<string>('POSTGRES_URL');
+
     super({
-      adapter: new PrismaPg({
-        connectionString: config.getOrThrow<string>('DATABASE_URL'),
-      }),
+      adapter: new PrismaPg({ connectionString }),
     });
   }
 
