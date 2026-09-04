@@ -8,7 +8,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Throttle } from '@nestjs/throttler';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { Public } from '../common/decorators/public.decorator.js';
@@ -28,7 +27,6 @@ export class AuthController {
   ) {}
 
   @Public()
-  @Throttle({ auth: { limit: 5, ttl: 60_000 } })
   @Post('login')
   @ApiOperation({ summary: 'Authenticate an admin and start a session' })
   async login(
@@ -46,7 +44,6 @@ export class AuthController {
   }
 
   @Public()
-  @Throttle({ auth: { limit: 10, ttl: 60_000 } })
   @Post('refresh')
   @ApiOperation({ summary: 'Exchange a refresh cookie for a new access token' })
   async refresh(
