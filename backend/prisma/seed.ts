@@ -1,7 +1,15 @@
 import { PrismaClient, ServiceCategory } from '@prisma/client';
 import * as argon2 from 'argon2';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const prisma = new PrismaClient();
+const connectionString =
+  process.env.DATABASE_URL ??
+  process.env.POSTGRES_PRISMA_URL ??
+  process.env.POSTGRES_URL;
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString }),
+});
 
 // Content mirrors what's already published on the public website
 // (ultrasound-website/src/utils/data.ts) — nothing invented here.
