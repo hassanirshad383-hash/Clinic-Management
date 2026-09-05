@@ -1,5 +1,6 @@
 import { Navigation } from "../components/Navigation";
 import { Footer } from "../components/Footer";
+import { WhatsAppButton } from "../components/WhatsAppButton";
 import { Hero } from "../sections/Hero";
 import { About } from "../sections/About";
 import { Services } from "../sections/Services";
@@ -24,6 +25,7 @@ export function Home() {
         <Contact />
       </main>
       <Footer />
+      <WhatsAppButton />
     </>
   );
 }
